@@ -29,8 +29,13 @@ spl_autoload_register(function ($class) {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
-// Rutas públicas (no requieren autenticación)
-$publicRoutes = ['', 'home', 'login', 'auth/login', 'register', 'auth/register'];
+// 🛒 RUTAS PÚBLICAS (no requieren autenticación) - AGREGAR CARRITO
+$publicRoutes = [
+    '', 'home', 'login', 'auth/login', 'register', 'auth/register',
+    // 🛒 AGREGAR TODAS LAS RUTAS DEL CARRITO COMO PÚBLICAS
+    'cart', 'cart/add', 'cart/remove', 'cart/update-quantity', 'cart/clear',
+    'checkout', 'cart/process-order'
+];
 
 // Verificar sesión solo para rutas protegidas
 if (!in_array($uri, $publicRoutes) && empty($_SESSION['user_id'])) {
@@ -70,9 +75,47 @@ switch ($uri) {
         $controller = new AuthController();
         $controller->processRegister();
         break;
-    
+        
+    // 🛒 RUTAS DEL CARRITO - PÚBLICAS
+    case 'cart':
+        $controller = new CartController();
+        $controller->view();
+        break;
+        
+    case 'cart/add':
+        $controller = new CartController();
+        $controller->add();
+        break;
+        
+    case 'cart/remove':
+        $controller = new CartController();
+        $controller->remove();
+        break;
+        
+    case 'cart/update-quantity':
+        $controller = new CartController();
+        $controller->updateQuantity();
+        break;
+        
+    case 'cart/clear':
+        $controller = new CartController();
+        $controller->clear();
+        break;
+
+    // 🛒 RUTAS DE CHECKOUT - PÚBLICAS
+    case 'checkout':
+        $controller = new CartController();
+        $controller->checkout();
+        break;
+        
+    case 'cart/process-order':
+        $controller = new CartController();
+        $controller->processOrder();
+        break;
+
     default:
         http_response_code(404);
         echo "Página no encontrada";
         break;
 }
+?>

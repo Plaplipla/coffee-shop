@@ -25,6 +25,26 @@
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
+                    
+                    <!-- 🛒 ÍCONO DEL CARRITO -->
+                    <li class="nav-item me-3">
+                        <a class="nav-link position-relative" href="/cart">
+                            <i class="bi bi-cart3" style="font-size: 1.2rem;"></i> Carrito
+                            <?php 
+                            $cartCount = 0;
+                            if (isset($_SESSION['cart'])) {
+                                foreach ($_SESSION['cart'] as $item) {
+                                    $cartCount += $item['quantity'];
+                                }
+                            }
+                            if ($cartCount > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <?php echo $cartCount; ?>
+                            </span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                    
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item me-3">
                             <span class="user-badge">
@@ -65,6 +85,25 @@
         </div>
     </div>
 
+    <!-- Mensajes de éxito/error -->
+    <div class="container mt-4">
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> 
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> 
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+    </div>
+
     <!-- Products Section -->
     <div class="container mb-5">
         <div class="row">
@@ -91,9 +130,16 @@
                                     <span class="product-price">$<?php echo number_format($product->price, 2); ?></span>
                                     <span class="badge bg-secondary"><?php echo htmlspecialchars($product->size ?? 'Regular'); ?></span>
                                 </div>
-                                <button class="btn btn-add-cart" onclick="showComingSoon()">
-                                    <i class="bi bi-cart-plus"></i> Agregar al Carrito
-                                </button>
+                                
+                                <!-- BOTÓN DIRECTO - SIN VALIDACIÓN DE LOGIN -->
+                                <form method="POST" action="/cart/add" class="d-inline w-100">
+                                    <input type="hidden" name="product_id" value="<?php echo $product->_id; ?>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="return_url" value="/home">
+                                    <button type="submit" class="btn btn-add-cart w-100">
+                                        <i class="bi bi-cart-plus"></i> Agregar al Carrito
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -103,10 +149,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function showComingSoon() {
-            alert('Carrito de compras - Próximamente');
-        }
-    </script>
 </body>
 </html>
